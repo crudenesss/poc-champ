@@ -10,8 +10,11 @@ python = "^3.11"
 typer = "^0.12.5"
 requests = "^2.32.3"
 bs4 = "^0.0.2"
-lxml = "^5.3.0"
+selenium = "^4.25.0"
+art = "^6.3"
 
+[tool.poetry.scripts]
+poc-champ = "poc_champ.main:app"
 
 [build-system]
 requires = ["poetry-core"]
