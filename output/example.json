@@ -1,0 +1,14 @@
+[
+    {
+        "CVE-1": [
+            "https://github.com/username/CVE-1-POC-repo-1",
+            "https://github.com/username/CVE-1-POC-repo-2",
+            "https://github.com/username/CVE-1-POC-repo-3"
+        ]
+    },
+    {
+        "CVE-3": [
+            "https://github.com/username/CVE-3-POC-repo-1"
+        ]
+    }
+]
