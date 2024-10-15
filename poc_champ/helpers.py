@@ -159,10 +159,9 @@ def request_cves(keyword, year_range):
 
     # Assemble and send request to cve.mitre.org
     rich_print(f"[bright_blue]{PREFIX}Searching by keywords: [bold]{keyword}[/bold]...[/bright_blue]")
-    keywords_prepared = re.sub(" ", "+", keyword, count=-1)
     response = requests.get(
         CVE_MITRE_LINK,
-        params={"keyword": keywords_prepared},
+        params={"keyword": keyword},
         timeout=10,
     )
 
@@ -247,10 +246,10 @@ def set_filename(filename, index):
     """
     if not re.findall(r"\.", filename):
         return f"{filename}-{str(index)}"
-    else:
-        filename_parts = filename.split(".")
-        filename_parts[0] += f"-{str(index)}"
-        return ".".join(filename_parts)
+
+    filename_parts = filename.split(".")
+    filename_parts[0] += f"-{str(index)}"
+    return ".".join(filename_parts)
 
 
 def output_file(filename, result):
