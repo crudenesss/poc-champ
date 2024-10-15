@@ -238,6 +238,16 @@ def request_from_duckduckgo(query):
 
 
 def set_filename(filename, index):
+    """Append index to filename gracefully to avoid overwriting.
+
+    ## Parameters:
+        **filename** (_str_): Original filename to replace.
+        **index** (_int_): Index to append in order for filenames in same directory
+        to differ.
+
+    ### Returns:
+        _str_: Altered filename with index appended.
+    """
     if not re.findall(r"\.", filename):
         return f"{filename}-{str(index)}"
     else:
@@ -247,6 +257,16 @@ def set_filename(filename, index):
 
 
 def output_file(filename, result):
+    """Cover logic behind checking filename availability, sending it to altering
+    and saving data to output filename.
+
+    ## Parameters:
+        **filename** (_str_): original filename passed through input.
+        **result** (_list_): lists of links to each CVE's POCs.
+
+    ### Returns:
+        _str_: final filename to save data to, whether altered or not.
+    """
     if os.path.exists(f"./output/{filename}"):
         rich_print(f"[yellow]Output file {filename} already exists.[/yellow]")
         i = 1
