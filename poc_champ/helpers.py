@@ -53,6 +53,7 @@ def get_blacklisted_paterns():
         "advisories",
         "blob",
         "issues",
+        "labels",
         "milestones",
         "projects",
         "pull",
