@@ -12,4 +12,7 @@ YEAR_RANGE_HELP = """Filter CVE by year published.
         * `<min_year>-<max_year>`: set year frame
 """
 OUTPUT_HELP = "Pass filename to save results into."
-PROGRESS_BAR = "[bold bright_blue]Make some tea, while I look for everything :tea:[/bold bright_blue]"
+PROGRESS_BAR = "[bold bright_blue]Make some tea, while I look for everything...[/bold bright_blue]"
+
+# Decorations
+PREFIX = "[*] "

@@ -12,7 +12,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 
-from poc_champ.constants import SEARCH_DUCKDUCKGO_ENDPOINT, CVE_MITRE_LINK
+from poc_champ.constants import SEARCH_DUCKDUCKGO_ENDPOINT, CVE_MITRE_LINK, PREFIX
 
 
 def set_range_pattern(min_year=None, max_year=None):
@@ -78,7 +78,7 @@ def parse_year_range(year_argument):
         Raw argument of year range.
 
     ### Raises:
-        `typer.Abort`: 
+        `typer.Exit`: 
         Graceful quit in case invalid argument were brought.
 
     ### Returns:
@@ -95,8 +95,8 @@ def parse_year_range(year_argument):
         year_interval = int(year_range[1]) - int(year_range[0])
 
         if year_interval < 0:
-            rich_print("Invalid year range format.")
-            raise typer.Abort()
+            rich_print(f"[bold red]{PREFIX}Invalid year range format.")
+            raise typer.Exit()
 
         year_min = int(year_range[0])
         year_max = int(year_range[1])
@@ -108,8 +108,8 @@ def parse_year_range(year_argument):
 
     # Other cases are trated as invalid formats
     else:
-        rich_print("Invalid year range format.")
-        raise typer.Abort()
+        rich_print(f"[bold red]{PREFIX}Invalid year range format.")
+        raise typer.Exit()
 
     return set_range_pattern(year_min, year_max)
 
@@ -147,7 +147,7 @@ def request_cves(keyword, year_range):
 
     ## Parameters:
         **keyword** (_str_): keywords to search for related CVE's.
-        **year_range** (_str_): raw year frame argument from CLI.
+        **year_range** (_str_): REGEX pattern of allowed year frame.
 
     ### Raises:
         `typer.Exit`: graceful exit in case request goes wrong.
@@ -157,11 +157,8 @@ def request_cves(keyword, year_range):
         CVE's parsed from html response.
     """
 
-    # Retrieve years to filter cve's by
-    year_range_pattern = parse_year_range(year_range)
-
     # Assemble and send request to cve.mitre.org
-    rich_print(f"Searching by keywords: {keyword}...")
+    rich_print(f"[bright_blue]{PREFIX}Searching by keywords: [bold]{keyword}[/bold]...[/bright_blue]")
     keywords_prepared = re.sub(" ", "+", keyword, count=-1)
     response = requests.get(
         CVE_MITRE_LINK,
@@ -172,13 +169,13 @@ def request_cves(keyword, year_range):
     # If request was somehow unsuccessful
     if response.status_code != 200:
         rich_print(
-            """Oops! Something went wrong =(
+            f"""\n[bold yellow]{PREFIX}Oops! Something went wrong =(
             Try checking internet connection"""
         )
         raise typer.Exit()
 
     # Send html response to parsing function
-    cve_list = parse_cve_response(response.text, year_range_pattern)
+    cve_list = parse_cve_response(response.text, year_range)
     return cve_list
 
 
@@ -268,7 +265,7 @@ def output_file(filename, result):
         _str_: final filename to save data to, whether altered or not.
     """
     if os.path.exists(f"./output/{filename}"):
-        rich_print(f"[yellow]Output file {filename} already exists.[/yellow]")
+        rich_print(f"[yellow]{PREFIX}Output file {filename} already exists.[/yellow]")
         i = 1
         while os.path.exists(f"./output/{set_filename(filename, i)}"):
             i += 1

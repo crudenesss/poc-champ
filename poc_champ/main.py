@@ -8,8 +8,8 @@ import typer
 from rich import print as rich_print
 from rich.progress import track
 
-from poc_champ.helpers import request_cves, request_from_duckduckgo, output_file
-from poc_champ.constants import YEAR_RANGE_HELP, OUTPUT_HELP, PROGRESS_BAR
+from poc_champ.helpers import request_cves, request_from_duckduckgo, output_file, parse_year_range
+from poc_champ.constants import YEAR_RANGE_HELP, OUTPUT_HELP, PROGRESS_BAR, PREFIX
 
 app = typer.Typer(name="poc-champ", add_completion=False)
 
@@ -40,17 +40,20 @@ def main(
     POC (Proof of Concept) to CVE's of interest.
     """
 
+    # Check validity and retrieve years to filter cve's by
+    year_range_pattern = parse_year_range(year_range)
+
     # Application banner
     rich_print(f"[yellow]{text2art('POCChamp', font='fire_font-s')}[/yellow]")
 
     # Get list of CVE's by keyword, exit if no found
-    cve_list = request_cves(keyword, year_range)
+    cve_list = request_cves(keyword, year_range_pattern)
     if not cve_list:
-        rich_print("[bold yellow]No results found =(\nExiting...[/bold yellow]")
+        rich_print(f"\n[bold yellow]{PREFIX}No results found =(\n{PREFIX}Exiting...[/bold yellow]")
         raise typer.Exit()
 
     rich_print(
-        f"[green]Found CVE: [/green][bold green]{len(cve_list)} result(s)\n[/bold green]"
+        f"[green]{PREFIX}Found CVE: [/green][bold green]{len(cve_list)} result(s)\n[/bold green]"
     )
 
     result = []
@@ -67,14 +70,14 @@ def main(
             result.append(cve_result)
 
     if not result:
-        rich_print("[bold yellow]Sorry, no repos were found =([/bold yellow]")
+        rich_print(f"\n[bold yellow]{PREFIX}Sorry, no repos were found =([/bold yellow]")
         raise typer.Exit()
 
     if not output:
         rich_print(json.dumps(result, indent=2))
     else:
         output = output_file(output, result)
-        rich_print(f"\n[bold bright_blue]Saved to {output}.[/bold bright_blue]")
+        rich_print(f"[bold bright_blue]{PREFIX}Saved to {output}.[/bold bright_blue]")
 
     if secret:
         rich_print("Temp")
