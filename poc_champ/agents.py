@@ -1,4 +1,13 @@
-""""""
+"""
+Agents module for CVE and repository search.
+
+This module provides functions to request CVE identifiers from cve.org
+and to search for related GitHub repositories using a search engine.
+
+Functions:
+    - request_cves: Search for CVEs by keyword and year range.
+    - request_repositories: Search for GitHub repositories related to a CVE.
+"""
 
 import re
 
@@ -16,36 +25,34 @@ from poc_champ.constants import (
     SEARCH_ENGINE_ENDPOINT,
     SEARCH_ENGINE_PARAM,
     SEARCH_ENGINE_BTN_CLASS,
-    SEARCH_ENGINE_EXPAND_ITER
+    SEARCH_ENGINE_EXPAND_ITER,
 )
 
 
-def request_cves(keyword, year_range):
-    """Send request to `cve.mitre.org` to get html response to parse.
-
-    ## Parameters:
-        **keyword** (_str_): keywords to search for related CVE's.
-        **year_range** (_str_): REGEX pattern of allowed year frame.
-
-    ### Raises:
-        `typer.Exit`: graceful exit in case request goes wrong.
-
-    ### Returns:
-        _list_: 
-        CVE's parsed from html response.
+def request_cves(keyword: str, year_range: str) -> list:
     """
+    Send request to `cve.org` to get HTML response to parse.
 
+    :param keyword: Keywords to search for related CVEs.
+    :type keyword: str
+    :param year_range: Regex pattern of allowed year frame.
+    :type year_range: str
+
+    :raises typer.Exit: Graceful exit in case request goes wrong.
+
+    :returns: List of CVEs parsed from HTML response.
+    :rtype: list
+    """
     # Assemble and send request to cve.mitre.org
-    pprint(f"[bright_blue]{PREFIX}Searching by keywords: [bold]{keyword}[/bold]...[/bright_blue]")
+    pprint(
+        f"[bright_blue]{PREFIX}Searching by keywords: [bold]{keyword}[/bold]...[/bright_blue]"
+    )
     sources = parse_javascript_page(
         CVE_ORG_ENDPOINT,
         param=CVE_ORG_SEARCH_PARAM,
         query=keyword,
         load_element=(By.TAG_NAME, "h2"),
-        paginate={
-            "action": "next",
-            "interact": (By.CLASS_NAME, CVE_ORG_BTN_CLASS)
-        }
+        paginate={"action": "next", "interact": (By.CLASS_NAME, CVE_ORG_BTN_CLASS)},
     )
 
     # Send html response to parsing function
@@ -64,27 +71,35 @@ def request_cves(keyword, year_range):
 
     return cve_list
 
-def request_repositories(cve):
-    """"""
 
+def request_repositories(cve: str) -> list:
+    """
+    Search for GitHub repositories related to a given CVE.
+
+    :param cve: CVE identifier to search for.
+    :type cve: str
+
+    :returns: List of GitHub repository URLs related to the CVE.
+    :rtype: list
+    """
     sources = parse_javascript_page(
         SEARCH_ENGINE_ENDPOINT,
         param=SEARCH_ENGINE_PARAM,
-        query=f"\"{cve}\"",
+        query=f'"{cve}"',
         load_element=(By.TAG_NAME, "section"),
         dork="site:github.com",
         paginate={
             "action": "expand",
             "interact": (By.ID, SEARCH_ENGINE_BTN_CLASS),
-            "iterations": SEARCH_ENGINE_EXPAND_ITER
-        }
+            "iterations": SEARCH_ENGINE_EXPAND_ITER,
+        },
     )
 
     if not sources:
         return []
 
     cve_poc = []
-        
+
     # Retrieve blacklisted keywords to filter
     pattern = get_blacklisted_paterns()
 

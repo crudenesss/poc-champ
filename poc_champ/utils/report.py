@@ -1,4 +1,13 @@
-"""Module handling job report generation and filename management."""
+"""
+Module handling job report generation and filename management.
+
+This module provides functions to:
+    - Safely generate filenames to avoid overwriting.
+    - Save job results to output files.
+
+:func set_filename: Append index to filename to avoid overwriting.
+:func generate_report: Save results to a file, altering filename if needed.
+"""
 
 import os
 import re
@@ -7,16 +16,15 @@ from rich import print as pprint
 
 from poc_champ.constants import PREFIX
 
-def set_filename(filename, index):
-    """Append index to filename gracefully to avoid overwriting.
 
-    ## Parameters:
-        **filename** (_str_): Original filename to replace.
-        **index** (_int_): Index to append in order for filenames in same directory
-        to differ.
+def set_filename(filename: str, index: int) -> str:
+    """
+    Append index to filename gracefully to avoid overwriting.
 
-    ### Returns:
-        _str_: Altered filename with index appended.
+    :param filename str: Original filename to replace.
+    :param index int: Index to append in order for filenames in same directory to differ.
+    :returns: Altered filename with index appended.
+    :rtype: str
     """
     if not re.findall(r"\.", filename):
         return f"{filename}-{str(index)}"
@@ -26,16 +34,14 @@ def set_filename(filename, index):
     return ".".join(filename_parts)
 
 
-def generate_report(filename, result):
-    """Cover logic behind checking filename availability, sending it to altering
-    and saving data to output filename.
+def generate_report(filename: str, result: list) -> str:
+    """
+    Check filename availability, alter if needed, and save data to output filename.
 
-    ## Parameters:
-        **filename** (_str_): original filename passed through input.
-        **result** (_list_): lists of links to each CVE's POCs.
-
-    ### Returns:
-        _str_: final filename to save data to, whether altered or not.
+    :param filename str: Original filename passed through input.
+    :param result list: List of links to each CVE's PoCs.
+    :returns: Final filename to save data to, whether altered or not.
+    :rtype: str
     """
     if os.path.exists(f"./output/{filename}"):
         pprint(f"[yellow]{PREFIX}Output file {filename} already exists.[/yellow]")

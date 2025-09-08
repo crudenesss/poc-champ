@@ -1,4 +1,9 @@
-"""Main module"""
+"""Main module for the poc-champ CLI tool.
+
+This module defines the entry point for the command-line interface,
+allowing users to search for CVEs and related GitHub repositories and
+generate reports.
+"""
 
 import json
 from typing import Optional
@@ -34,11 +39,18 @@ def main(
     ] = None,
     secret: Annotated[bool, typer.Option("--secret", help="Trust me.")] = False,
 ):
-
-    """Web-scrapping CLI tool to retrieve links to Github repositories containing
-    POC (Proof of Concept) to CVE's of interest.
     """
+    Web-scraping CLI tool to retrieve links to Github repositories containing
+    POC (Proof of Concept) to CVE's of interest.
 
+    :param keyword str: Keywords to find related CVEs by.
+    :param year_range Optional[str]: Year range to filter CVEs.
+    :param output Optional[str]: Filename to save results into.
+    :param secret bool: Display a secret message if True.
+
+    :returns: None. Prints results or saves to file.
+    :rtype: None
+    """
     result = run_job(keyword, year_range)
 
     if not output:
