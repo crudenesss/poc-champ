@@ -7,7 +7,24 @@ POC (Proof of Concept) to CVE's of interest.
 
 1. Send request to `cve.mitre.org` to retrieve related CVE's by keyword provided by user.
 2. Using parsed response, search for POC repositories for each CVE with `DDG` search engine.
-3. Return scrapped results in JSON format. **_Tip:_** you can view example format of result in `output/example.json`.
+3. Return scrapped results in JSON format. Example output is:
+
+```json
+[
+    {
+        "CVE-1": [
+            "https://github.com/username/CVE-1-POC-repo-1",
+            "https://github.com/username/CVE-1-POC-repo-2",
+            "https://github.com/username/CVE-1-POC-repo-3"
+        ]
+    },
+    {
+        "CVE-3": [
+            "https://github.com/username/CVE-3-POC-repo-1"
+        ]
+    }
+]
+```
 
 ## Usage:
 
@@ -30,10 +47,8 @@ $ python -m poc_champ [OPTIONS]
 ### With Docker:
 ```console
 $ docker build -t poc-champ .
-$ docker run [--rm] -v <preferred_host_destination>:/poc-champ/output poc-champ [OPTIONS]
+$ docker run [--rm] poc-champ [OPTIONS] > output.json
 ```
-
-**Note:** You'll need `-v` option above especially if you plan on saving output to files on your host machine. 
 
 **Options**:
 
@@ -46,17 +61,3 @@ Allowed formats:
 * `-o, --output TEXT`: Pass filename to save results into.
 * `--secret`: Trust me.
 * `--help`: Show this message and exit.
-
----
-
-### Parameters:
-    keyword (Annotated[str, typer.Option]):
-    Required option. Provide keywords to later find related CVE.
-
-    year_range (Annotated[Optional[str], typer.Option], optional): 
-    Provide year time frame. Defaults to None, which results in setting the timeframe of
-    last 5 years.
-
-### Raises:
-    typer.Exit:
-    If particular exceptions arise, exit POCChamp gracefully.

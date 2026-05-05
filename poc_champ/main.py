@@ -1,15 +1,19 @@
-"""Main module"""
+"""Main module for the poc-champ CLI tool.
+
+This module defines the entry point for the command-line interface,
+allowing users to search for CVEs and related GitHub repositories and
+generate reports.
+"""
 
 import json
 from typing import Optional
 from typing_extensions import Annotated
-from art import text2art
 import typer
-from rich import print as rich_print
-from rich.progress import track
+from rich import print as pprint
 
-from poc_champ.helpers import request_cves, request_from_duckduckgo, output_file, parse_year_range
-from poc_champ.constants import YEAR_RANGE_HELP, OUTPUT_HELP, PROGRESS_BAR, PREFIX
+from poc_champ.utils.report import generate_report
+from poc_champ.manager import run_job
+from poc_champ.constants import YEAR_RANGE_HELP, OUTPUT_HELP, PREFIX
 
 app = typer.Typer(name="poc-champ", add_completion=False)
 
@@ -35,49 +39,25 @@ def main(
     ] = None,
     secret: Annotated[bool, typer.Option("--secret", help="Trust me.")] = False,
 ):
-
-    """Web-scrapping CLI tool to retrieve links to Github repositories containing
-    POC (Proof of Concept) to CVE's of interest.
     """
+    Web-scraping CLI tool to retrieve links to Github repositories containing
+    POC (Proof of Concept) to CVE's of interest.
 
-    # Check validity and retrieve years to filter cve's by
-    year_range_pattern = parse_year_range(year_range)
+    :param keyword str: Keywords to find related CVEs by.
+    :param year_range Optional[str]: Year range to filter CVEs.
+    :param output Optional[str]: Filename to save results into.
+    :param secret bool: Display a secret message if True.
 
-    # Application banner
-    rich_print(f"[yellow]{text2art('POCChamp', font='fire_font-s')}[/yellow]")
-
-    # Get list of CVE's by keyword, exit if no found
-    cve_list = request_cves(keyword, year_range_pattern)
-    if not cve_list:
-        rich_print(f"\n[bold yellow]{PREFIX}No results found =(\n{PREFIX}Exiting...[/bold yellow]")
-        raise typer.Exit()
-
-    rich_print(
-        f"[green]{PREFIX}Found CVE: [/green][bold green]{len(cve_list)} result(s)\n[/bold green]"
-    )
-
-    result = []
-
-    for cve in track(
-        cve_list,
-        description=PROGRESS_BAR,
-        transient=True,
-    ):
-
-        cve_links = request_from_duckduckgo(cve)
-        if cve_links:
-            cve_result = {cve: cve_links}
-            result.append(cve_result)
-
-    if not result:
-        rich_print(f"\n[bold yellow]{PREFIX}Sorry, no repos were found =([/bold yellow]")
-        raise typer.Exit()
+    :returns: None. Prints results or saves to file.
+    :rtype: None
+    """
+    result = run_job(keyword, year_range)
 
     if not output:
-        rich_print(json.dumps(result, indent=2))
+        pprint(json.dumps(result, indent=2))
     else:
-        output = output_file(output, result)
-        rich_print(f"[bold bright_blue]{PREFIX}Saved to {output}.[/bold bright_blue]")
+        output = generate_report(output, result)
+        pprint(f"[bold bright_blue]{PREFIX}Saved to {output}.[/bold bright_blue]")
 
     if secret:
-        rich_print("Temp")
+        pprint("Temp")

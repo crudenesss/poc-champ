@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "poc-champ"
-version = "1.0.0"
+version = "1.1.0"
 description = ""
 authors = ["crudenesss <osbochok.w@gmail.com>"]
 readme = "README.md"
@@ -12,6 +12,11 @@ requests = "^2.32.3"
 bs4 = "^0.0.2"
 selenium = "^4.25.0"
 art = "^6.3"
+
+[tool.poetry.group.dev.dependencies]
+pylint = "^3.3.8"
+black = "^25.1.0"
+pytest = "^8.4.2"
 
 [tool.poetry.scripts]
 poc-champ = "poc_champ.main:app"
