@@ -8,4 +8,8 @@ def get_parser():
     args = parser.parse_args()
     if re.match(r"^\d{4}-\d{4}$", args.range):
         args.range = args.range.split("-")
+    elif re.match(r"^\d{4}$", args.range):
+        pass
+    else:
+        exit(1)
     return args
