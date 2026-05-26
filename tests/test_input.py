@@ -1,6 +1,7 @@
 """Tests for the input module."""
 
 import sys
+import pytest
 
 from poc_champ.cli import get_parser
 
@@ -22,3 +23,9 @@ class TestInput:
         args = get_parser()
         assert args.keyword == "keyword"
         assert args.range == ["2020", "2026"]
+
+    def test_fail_invalid_year_range(self, monkeypatch):
+        """Provide an invalid year range where the start year is greater than the end year."""
+        monkeypatch.setattr(sys, "argv", ["poc-champ", "-k", "keyword", "-r", "2020/2026"])
+        with pytest.raises(SystemExit):
+            get_parser()
