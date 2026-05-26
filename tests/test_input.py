@@ -29,3 +29,9 @@ class TestInput:
         monkeypatch.setattr(sys, "argv", ["poc-champ", "-k", "keyword", "-r", "2020/2026"])
         with pytest.raises(SystemExit):
             get_parser()
+
+    def test_fail_none_required_options(self, monkeypatch):
+        """Provide none of the required arguments."""
+        monkeypatch.setattr(sys, "argv", ["poc-champ"])
+        with pytest.raises(SystemExit):
+            get_parser()
