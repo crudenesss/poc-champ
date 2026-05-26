@@ -1,5 +1,6 @@
 import argparse
 import re
+import sys
 
 def get_parser():
     parser = argparse.ArgumentParser()
@@ -11,5 +12,6 @@ def get_parser():
     elif re.match(r"^\d{4}$", args.range):
         pass
     else:
-        exit(1)
+        print(f"Argument {args.range} is not a valid range.")
+        sys.exit(1)
     return args
