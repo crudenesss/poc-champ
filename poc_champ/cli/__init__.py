@@ -4,7 +4,7 @@ import sys
 
 def get_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-k", "--keyword", type=str)
+    parser.add_argument("-k", "--keyword", type=str, required=True)
     parser.add_argument("-r", "--range", type=str)
     args = parser.parse_args()
     if re.match(r"^\d{4}-\d{4}$", args.range):
