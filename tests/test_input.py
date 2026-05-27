@@ -51,3 +51,10 @@ class TestInput:
         monkeypatch.setattr(sys, "argv", ["poc-champ", "-k", "keyword", "-x", "unknown"])
         with pytest.raises(SystemExit):
             get_parser()
+
+    def test_success_cve(self, monkeypatch, excpected_default_year_range):
+        """Provide valid cve option."""
+        monkeypatch.setattr(sys, "argv", ["poc-champ", "-c", "CVE-2026-0001"])
+        args = get_parser()
+        assert args.cve == "CVE-2026-0001"
+        assert args.range == excpected_default_year_range
