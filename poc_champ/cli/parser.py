@@ -13,7 +13,11 @@ class ConfigParser:
 
     def __init__(self, description):
         self.parser = argparse.ArgumentParser(description=description)
-        self.parser.add_argument("-k", "--keyword", type=str, required=True)
+
+        group = self.parser.add_mutually_exclusive_group(required=True)
+        group.add_argument("-k", "--keyword", type=str, help="Keywords to find related CVE's by.")
+        group.add_argument("-c", "--cve", type=str, help="CVE ID to find related POCs for.")
+
         self.parser.add_argument(
             "-r", "--range", type=self._validate_year_range, default=self._set_default_year_range()
         )
