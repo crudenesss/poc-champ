@@ -13,13 +13,27 @@ class ConfigParser:
 
     def __init__(self, description):
         self.parser = argparse.ArgumentParser(description=description)
+        self._setup_arguments()
 
+    def _setup_arguments(self):
+        """Initialise CLI arguments."""
         group = self.parser.add_mutually_exclusive_group(required=True)
-        group.add_argument("-k", "--keyword", type=str, help="Keywords to find related CVE's by.")
-        group.add_argument("-c", "--cve", type=self._validate_cve_format, help="CVE ID to find related POCs for.")
+
+        group.add_argument(
+            "-k", "--keyword", 
+            type=str,
+            help="Keywords to find related CVE's by."
+        )
+        group.add_argument(
+            "-c", "--cve", 
+            type=self._validate_cve_format,
+            help="CVE ID to find related POCs for."
+        )
 
         self.parser.add_argument(
-            "-r", "--range", type=self._validate_year_range, default=self._set_default_year_range()
+            "-r", "--range", 
+            type=self._validate_year_range,
+            default=self._set_default_year_range()
         )
 
     @staticmethod
