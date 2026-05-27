@@ -15,14 +15,14 @@ class TestInput:
         monkeypatch.setattr(sys, "argv", ["poc-champ", "-k", "keyword", "-r", "2026"])
         args = get_parser()
         assert args.keyword == "keyword"
-        assert args.range == "2026"
+        assert args.range == range(2026, 2027)
 
     def test_success_range_year_range(self, monkeypatch):
         """Provide CVE year range with a start and end year."""
         monkeypatch.setattr(sys, "argv", ["poc-champ", "-k", "keyword", "-r", "2020-2026"])
         args = get_parser()
         assert args.keyword == "keyword"
-        assert args.range == ["2020", "2026"]
+        assert args.range == range(2020, 2027)
 
     def test_success_keyword(self, monkeypatch, excpected_default_year_range):
         """Provide minimal valid arguments amount in a form of keyword option.
