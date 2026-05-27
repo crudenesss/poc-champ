@@ -59,6 +59,12 @@ class TestInput:
         assert args.cve == "CVE-2026-0001"
         assert args.range == excpected_default_year_range
 
+    def test_fail_invalid_cve_format(self, monkeypatch):
+        """Provide an invalid CVE format."""
+        monkeypatch.setattr(sys, "argv", ["poc-champ", "-c", "INVALID-CVE-FORMAT"])
+        with pytest.raises(SystemExit):
+            get_parser()
+
     def test_fail_conflicting_options(self, monkeypatch):
         """Provide both keyword and CVE option."""
         monkeypatch.setattr(sys, "argv", ["poc-champ", "-k", "keyword", "-c", "CVE-2026-0001"])
