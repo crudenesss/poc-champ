@@ -58,3 +58,9 @@ class TestInput:
         args = get_parser()
         assert args.cve == "CVE-2026-0001"
         assert args.range == excpected_default_year_range
+
+    def test_fail_conflicting_options(self, monkeypatch):
+        """Provide both keyword and CVE option."""
+        monkeypatch.setattr(sys, "argv", ["poc-champ", "-k", "keyword", "-c", "CVE-2026-0001"])
+        with pytest.raises(SystemExit):
+            get_parser()
