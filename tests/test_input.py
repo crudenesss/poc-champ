@@ -35,3 +35,9 @@ class TestInput:
         monkeypatch.setattr(sys, "argv", ["poc-champ"])
         with pytest.raises(SystemExit):
             get_parser()
+
+    def test_fail_unknown_option(self, monkeypatch):
+        """Provide an unknown option."""
+        monkeypatch.setattr(sys, "argv", ["poc-champ", "-k", "keyword", "-x", "unknown"])
+        with pytest.raises(SystemExit):
+            get_parser()
