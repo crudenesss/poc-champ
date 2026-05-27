@@ -24,6 +24,16 @@ class TestInput:
         assert args.keyword == "keyword"
         assert args.range == ["2020", "2026"]
 
+    def test_success_keyword(self, monkeypatch):
+        """Provide minimal valid arguments amount in a form of keyword option.
+        
+        - Verify the parser returns the time range of last 5 years.
+        """
+        monkeypatch.setattr(sys, "argv", ["poc-champ", "-k", "keyword"])
+        args = get_parser()
+        assert args.keyword == "keyword"
+        assert args.range == ["2022", "2026"]
+
     def test_fail_invalid_year_range(self, monkeypatch):
         """Provide an invalid year range where the start year is greater than the end year."""
         monkeypatch.setattr(sys, "argv", ["poc-champ", "-k", "keyword", "-r", "2020/2026"])
