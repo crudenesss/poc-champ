@@ -38,20 +38,23 @@ class ConfigParser:
 
     @staticmethod
     def _set_default_year_range():
-        current_year = datetime.now().year
-        return [str(current_year - 4), str(current_year)]
+        upper_year_threshold = datetime.now().year + 1
+        return range(upper_year_threshold - 5, upper_year_threshold)
 
     @staticmethod
     def _validate_year_range(year_range):
-        if re.match(r"^\d{4}-\d{4}$", year_range):
+        if re.match(r"(^\d{4}$)|(^\d{4}-\d{4}$)", year_range):
             year_range = year_range.split("-")
-        elif re.match(r"^\d{4}$", year_range):
-            pass
         else:
             print(f"Argument {year_range} is not a valid range.")
             sys.exit(1)
 
-        return year_range
+        if len(year_range) == 1:
+            result = range(int(year_range[0]), int(year_range[0]) + 1)
+        else:
+            result = range(int(year_range[0]), int(year_range[1]) + 1)
+
+        return result
 
     @staticmethod
     def _validate_cve_format(cve):
