@@ -12,14 +12,14 @@ class TestInput:
 
     def test_success_range_single_year(self, monkeypatch):
         """Provide CVE year range limited to a single year."""
-        monkeypatch.setattr(sys, "argv", ["poc-champ", "-k", "keyword", "-r", "2026"])
+        monkeypatch.setattr(sys, "argv", ["poc-champ", "key", "keyword", "-r", "2026"])
         args = get_parser()
         assert args.keyword == "keyword"
         assert args.range == range(2026, 2027)
 
     def test_success_range_year_range(self, monkeypatch):
         """Provide CVE year range with a start and end year."""
-        monkeypatch.setattr(sys, "argv", ["poc-champ", "-k", "keyword", "-r", "2020-2026"])
+        monkeypatch.setattr(sys, "argv", ["poc-champ", "key", "keyword", "-r", "2020-2026"])
         args = get_parser()
         assert args.keyword == "keyword"
         assert args.range == range(2020, 2027)
@@ -29,14 +29,14 @@ class TestInput:
         
         - Verify the parser returns the time range of last 5 years.
         """
-        monkeypatch.setattr(sys, "argv", ["poc-champ", "-k", "keyword"])
+        monkeypatch.setattr(sys, "argv", ["poc-champ", "key", "keyword"])
         args = get_parser()
         assert args.keyword == "keyword"
         assert args.range == excpected_default_year_range
 
     def test_fail_invalid_year_range(self, monkeypatch):
         """Provide an invalid year range where the start year is greater than the end year."""
-        monkeypatch.setattr(sys, "argv", ["poc-champ", "-k", "keyword", "-r", "2020/2026"])
+        monkeypatch.setattr(sys, "argv", ["poc-champ", "key", "keyword", "-r", "2020/2026"])
         with pytest.raises(SystemExit):
             get_parser()
 
@@ -48,25 +48,24 @@ class TestInput:
 
     def test_fail_unknown_option(self, monkeypatch):
         """Provide an unknown option."""
-        monkeypatch.setattr(sys, "argv", ["poc-champ", "-k", "keyword", "-x", "unknown"])
+        monkeypatch.setattr(sys, "argv", ["poc-champ", "key", "keyword", "-x", "unknown"])
         with pytest.raises(SystemExit):
             get_parser()
 
-    def test_success_cve(self, monkeypatch, excpected_default_year_range):
+    def test_success_cve(self, monkeypatch):
         """Provide valid cve option."""
-        monkeypatch.setattr(sys, "argv", ["poc-champ", "-c", "CVE-2026-0001"])
+        monkeypatch.setattr(sys, "argv", ["poc-champ", "cve", "CVE-2026-0001"])
         args = get_parser()
-        assert args.cve == "CVE-2026-0001"
-        assert args.range == excpected_default_year_range
+        assert args.cve_id == "CVE-2026-0001"
 
     def test_fail_invalid_cve_format(self, monkeypatch):
         """Provide an invalid CVE format."""
-        monkeypatch.setattr(sys, "argv", ["poc-champ", "-c", "INVALID-CVE-FORMAT"])
+        monkeypatch.setattr(sys, "argv", ["poc-champ", "cve", "INVALID-CVE-FORMAT"])
         with pytest.raises(SystemExit):
             get_parser()
 
     def test_fail_conflicting_options(self, monkeypatch):
         """Provide both keyword and CVE option."""
-        monkeypatch.setattr(sys, "argv", ["poc-champ", "-k", "keyword", "-c", "CVE-2026-0001"])
+        monkeypatch.setattr(sys, "argv", ["poc-champ", "key", "keyword", "cve", "CVE-2026-0001"])
         with pytest.raises(SystemExit):
             get_parser()
