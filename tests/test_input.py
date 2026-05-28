@@ -69,3 +69,9 @@ class TestInput:
         monkeypatch.setattr(sys, "argv", ["poc-champ", "key", "keyword", "cve", "CVE-2026-0001"])
         with pytest.raises(SystemExit):
             get_parser()
+
+    def test_fail_conflicting_subcommand_option(self, monkeypatch):
+        """Provide CVE subcommand with range option which is not a part of the cve subcommand."""
+        monkeypatch.setattr(sys, "argv", ["poc-champ", "cve", "CVE-2026-0001", "-r", "2020-2026"])
+        with pytest.raises(SystemExit):
+            get_parser()
