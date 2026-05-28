@@ -1,10 +1,10 @@
 """Module for CLI argument parsing and validation."""
 
 import argparse
-import re
-import sys
 
 from datetime import datetime
+
+from poc_champ.cli.validators import YearRangeValidator, CveValidator
 
 
 class ConfigParser:
@@ -32,7 +32,7 @@ class ConfigParser:
         )
         parser_key.add_argument(
             "-r", "--range", 
-            type=self._validate_year_range,
+            type=YearRangeValidator(),
             default=self._set_default_year_range()
         )
 
@@ -42,35 +42,13 @@ class ConfigParser:
         )
         parser_cve.add_argument(
             "cve_id",
-            type=self._validate_cve_format,
+            type=CveValidator(),
             help="CVE ID to find related POCs for."
         )
 
     def _set_default_year_range(self):
         upper_year_threshold = datetime.now().year + 1
         return range(upper_year_threshold - self.DEFAULT_YEAR_COUNT, upper_year_threshold)
-
-    @staticmethod
-    def _validate_year_range(year_range):
-        if re.match(r"(^\d{4}$)|(^\d{4}-\d{4}$)", year_range):
-            year_range = year_range.split("-")
-        else:
-            print(f"Argument {year_range} is not a valid range.")
-            sys.exit(1)
-
-        if len(year_range) == 1:
-            result = range(int(year_range[0]), int(year_range[0]) + 1)
-        else:
-            result = range(int(year_range[0]), int(year_range[1]) + 1)
-
-        return result
-
-    @staticmethod
-    def _validate_cve_format(cve):
-        if not re.match(r"^CVE-\d{4}-\d{4,}$", cve):
-            print(f"Argument {cve} is not a valid CVE format.")
-            sys.exit(1)
-        return cve
 
     def parse(self) -> argparse.Namespace:
         """Wrapper method around argparse internal processing. 
