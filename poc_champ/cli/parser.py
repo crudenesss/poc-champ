@@ -11,6 +11,8 @@ class ConfigParser:
 
     """Parser instance with argument initialisation and processing."""
 
+    DEFAULT_YEAR_COUNT = 5
+
     def __init__(self, description):
         self.parser = argparse.ArgumentParser(description=description)
         self._setup_arguments()
@@ -44,10 +46,9 @@ class ConfigParser:
             help="CVE ID to find related POCs for."
         )
 
-    @staticmethod
-    def _set_default_year_range():
+    def _set_default_year_range(self):
         upper_year_threshold = datetime.now().year + 1
-        return range(upper_year_threshold - 5, upper_year_threshold)
+        return range(upper_year_threshold - self.DEFAULT_YEAR_COUNT, upper_year_threshold)
 
     @staticmethod
     def _validate_year_range(year_range):
