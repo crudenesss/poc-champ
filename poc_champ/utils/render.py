@@ -1,17 +1,19 @@
 """Utilities for rendering and interacting with web pages using Selenium.
 
-This module provides functions for waiting for elements, paginating, and parsing JavaScript-rendered pages.
+This module provides functions for waiting for elements, paginating, 
+and parsing JavaScript-rendered pages.
 """
 
 from typing import Any
-import typer
 
 from selenium import webdriver
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.common.exceptions import NoSuchElementException, WebDriverException
-
-from rich import print as pprint
+from selenium.common.exceptions import (
+    NoSuchElementException,
+    WebDriverException,
+    TimeoutException,
+)
 
 from poc_champ.constants import PREFIX
 
@@ -25,7 +27,7 @@ def wait_load(browser_instance: webdriver.Firefox, element: tuple):
     :param element: Tuple specifying how to locate the element.
     :type element: tuple
 
-    :raises typer.Exit: If the page fails to load.
+    :raises RuntimeError: If the page fails to load.
     """
     try:
         WebDriverWait(browser_instance, 30).until(
@@ -33,8 +35,7 @@ def wait_load(browser_instance: webdriver.Firefox, element: tuple):
         )
     except WebDriverException as exc:
         browser_instance.close()
-        pprint("\n[bold red]Connection failed. Exiting...[/bold red]")
-        raise typer.Exit() from exc
+        raise RuntimeError("\n[bold red]Connection failed. Exiting...[/bold red]") from exc
 
 
 def page_interaction(
@@ -59,10 +60,13 @@ def page_interaction(
     :rtype: bool
     """
     try:
-        link = browser_instance.find_element(next_btn_param, next_btn_value)
-        link.click()
+        link = WebDriverWait(browser_instance, 10).until(
+            ec.element_to_be_clickable((next_btn_param, next_btn_value))
+        )
+        # Use JavaScript to click, avoiding stale element issues
+        browser_instance.execute_script("arguments[0].click();", link)
         wait_load(browser_instance, wait_element_load)
-    except NoSuchElementException:
+    except (NoSuchElementException, TimeoutException):
         return True
 
     return False
@@ -92,14 +96,13 @@ def paginate(
     :returns: List of page sources collected during pagination.
     :rtype: list
 
-    :raises typer.Exit: If required pagination parameters are missing.
+    :raises RuntimeError: If required pagination parameters are missing.
     """
     if not interact or not action:
         missing = "button action" if not action else "button identifier"
-        pprint(
+        raise RuntimeError(
             f"\n[bold yellow]{PREFIX}No {missing} provided =(\n{PREFIX}Exiting...[/bold yellow]"
         )
-        raise typer.Exit()
 
     pages = []
     counter = 0
@@ -143,7 +146,7 @@ def parse_javascript_page(
     :returns: List of page sources containing search results.
     :rtype: list
 
-    :raises typer.Exit: If browser connection fails.
+    :raises RuntimeError: If browser connection fails.
     """
     # Configure browser instance to run on background (without GUI)
     options = webdriver.FirefoxOptions()
@@ -160,8 +163,7 @@ def parse_javascript_page(
         browser.get(request)
     except WebDriverException as exc:
         browser.close()
-        pprint("\n[bold red]Connection init failed. Exiting...[/bold red]")
-        raise typer.Exit() from exc
+        raise RuntimeError("\n[bold red]Connection init failed. Exiting...[/bold red]") from exc
 
     wait_load(browser, load_element)
 

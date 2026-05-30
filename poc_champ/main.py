@@ -6,58 +6,26 @@ generate reports.
 """
 
 import json
-from typing import Optional
-from typing_extensions import Annotated
-import typer
+from art import text2art
 from rich import print as pprint
 
-from poc_champ.utils.report import generate_report
 from poc_champ.manager import run_job
-from poc_champ.constants import YEAR_RANGE_HELP, OUTPUT_HELP, PREFIX
+from poc_champ.constants import PREFIX
+from poc_champ.cli import get_parser
 
-app = typer.Typer(name="poc-champ", add_completion=False)
 
-
-@app.command()
-def main(
-    keyword: Annotated[
-        str,
-        typer.Option(
-            "-k",
-            "--keyword",
-            help="Keywords to find related CVE's by.",
-            show_default=False,
-        ),
-    ],
-    year_range: Annotated[
-        Optional[str],
-        typer.Option("-r", "--range", help=YEAR_RANGE_HELP, show_default=False),
-    ] = None,
-    output: Annotated[
-        Optional[str],
-        typer.Option("-o", "--output", help=OUTPUT_HELP, show_default=False),
-    ] = None,
-    secret: Annotated[bool, typer.Option("--secret", help="Trust me.")] = False,
-):
+def app():
     """
     Web-scraping CLI tool to retrieve links to Github repositories containing
     POC (Proof of Concept) to CVE's of interest.
-
-    :param keyword str: Keywords to find related CVEs by.
-    :param year_range Optional[str]: Year range to filter CVEs.
-    :param output Optional[str]: Filename to save results into.
-    :param secret bool: Display a secret message if True.
-
-    :returns: None. Prints results or saves to file.
-    :rtype: None
     """
-    result = run_job(keyword, year_range)
 
-    if not output:
-        pprint(json.dumps(result, indent=2))
-    else:
-        output = generate_report(output, result)
-        pprint(f"[bold bright_blue]{PREFIX}Saved to {output}.[/bold bright_blue]")
+    # Application banner
+    pprint(f"[yellow]{text2art('POCChamp', font='fire_font-s')}[/yellow]")
 
-    if secret:
-        pprint("Temp")
+    args = vars(get_parser())
+    try:
+        result = run_job(args)
+        pprint(json.dumps(result))
+    except RuntimeError as err:
+        pprint(f"{PREFIX}{err}")
