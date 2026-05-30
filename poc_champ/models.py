@@ -10,3 +10,4 @@ class ProcessedArgs(TypedDict):
     keyword: Optional[str]
     cve_id: Optional[str]
     range: Optional[str]
+    workers: int
