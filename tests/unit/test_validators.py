@@ -32,14 +32,14 @@ class TestYearValidator:
 
         year = "2026"
         validate = YearRangeValidator()
-        assert validate(year) == range(2026, 2027)
+        assert validate(year) == "2026"
 
     def test_success_valid_year_range(self):
         """Provide valid year range."""
 
         year_range = "2020-2026"
         validate = YearRangeValidator()
-        assert validate(year_range) == range(2020, 2027)
+        assert validate(year_range) == "2020|2021|2022|2023|2024|2025|2026"
 
     def test_fail_invalid_year_range_format(self):
         """Provide year range with invalid syntax."""
