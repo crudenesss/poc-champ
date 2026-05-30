@@ -16,7 +16,6 @@ from bs4 import BeautifulSoup
 from selenium.webdriver.common.by import By
 
 from poc_champ.utils.render import parse_javascript_page
-from poc_champ.utils.parser import get_blacklisted_paterns
 from poc_champ.constants import (
     PREFIX,
     CVE_ORG_ENDPOINT,
@@ -26,6 +25,7 @@ from poc_champ.constants import (
     SEARCH_ENGINE_PARAM,
     SEARCH_ENGINE_BTN_CLASS,
     SEARCH_ENGINE_EXPAND_ITER,
+    SEARCH_ENGINE_EXCLUDE_ENDPOINTS
 )
 
 
@@ -37,8 +37,6 @@ def request_cves(keyword: str, year_range: str) -> list:
     :type keyword: str
     :param year_range: Regex pattern of allowed year frame.
     :type year_range: str
-
-    :raises typer.Exit: Graceful exit in case request goes wrong.
 
     :returns: List of CVEs parsed from HTML response.
     :rtype: list
@@ -59,14 +57,14 @@ def request_cves(keyword: str, year_range: str) -> list:
     cve_list = []
     for response in sources:
         # Find table with CVE in html response
-        bs = BeautifulSoup(response, features="html.parser")
+        bs = BeautifulSoup(response, features="lxml")
 
         # From all CVE's, retrieve such that match provided year frame.
         # Note: CVE-<year>-<code> is the format of CVE ID's.
         for row in bs.find_all("a"):
             if not row.string:
                 continue
-            if re.match(rf"\bCVE-({year_range})-\d{{4,6}}\b", row.string):
+            if re.match(rf"\bCVE-({year_range})-\d{{4,}}\b", row.string):
                 cve_list.append(row.string)
 
     return cve_list
@@ -82,6 +80,17 @@ def request_repositories(cve: str) -> list:
     :returns: List of GitHub repository URLs related to the CVE.
     :rtype: list
     """
+
+    def get_blacklisted_paterns() -> str:
+        """
+        Generate a regex pattern of blacklisted keywords for links to exclude.
+
+        :returns: Regex pattern for blacklisted endpoints.
+        :rtype: str
+        """
+        blacklist_pattern = "|".join(SEARCH_ENGINE_EXCLUDE_ENDPOINTS)
+        return blacklist_pattern
+
     sources = parse_javascript_page(
         SEARCH_ENGINE_ENDPOINT,
         param=SEARCH_ENGINE_PARAM,
@@ -105,7 +114,7 @@ def request_repositories(cve: str) -> list:
 
     # Parse Github links
     for page in sources:
-        bs = BeautifulSoup(page, features="html.parser")
+        bs = BeautifulSoup(page, features="lxml")
         links = bs.find_all("a", attrs={"data-testid": "result-title-a"})
 
         for link in links:
