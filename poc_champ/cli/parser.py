@@ -11,7 +11,7 @@ class ConfigParser:
 
     """Parser instance with argument initialisation and processing."""
 
-    DEFAULT_YEAR_COUNT = 5
+    DEFAULT_YEAR_GAP = 4
 
     def __init__(self, description):
         self.parser = argparse.ArgumentParser(description=description)
@@ -47,8 +47,9 @@ class ConfigParser:
         )
 
     def _set_default_year_range(self):
-        upper_year_threshold = datetime.now().year + 1
-        return range(upper_year_threshold - self.DEFAULT_YEAR_COUNT, upper_year_threshold)
+        upper_year = datetime.now().year
+        year_list = [upper_year - self.DEFAULT_YEAR_GAP, upper_year]
+        return "-".join([str(year) for year in year_list])
 
     def parse(self) -> argparse.Namespace:
         """Wrapper method around argparse internal processing. 

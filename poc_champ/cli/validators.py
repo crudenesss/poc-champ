@@ -24,13 +24,13 @@ class YearRangeValidator(BaseValidator):
 
         return self._process_year_range(value)
 
-    def _process_year_range(self, value: str) -> range:
-        year_range = value.split("-")
-        if len(year_range) == 1:
-            result = range(int(year_range[0]), int(year_range[0]) + 1)
+    def _process_year_range(self, value: str) -> str:
+        year_list = value.split("-")
+        if len(year_list) == 1:
+            year_range = range(int(year_list[0]), int(year_list[0]) + 1)
         else:
-            result = range(int(year_range[0]), int(year_range[1]) + 1)
-        return result
+            year_range = range(int(year_list[0]), int(year_list[1]) + 1)
+        return "|".join([str(year) for year in year_range])
 
 
 class CveValidator(BaseValidator):
