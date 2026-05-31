@@ -7,12 +7,11 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-requests = "^2.32.3"
 bs4 = "^0.0.2"
-selenium = "^4.25.0"
 art = "^6.3"
 lxml = "^6.1.1"
 rich = "^15.0.0"
+playwright = "^1.60.0"
 
 [tool.poetry.group.dev.dependencies]
 pylint = "^3.3.8"
