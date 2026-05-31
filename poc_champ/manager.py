@@ -3,6 +3,8 @@
 This module provides the main job runner for searching CVEs and related repositories.
 """
 
+import asyncio
+
 from rich import print as pprint
 from rich.progress import track
 
@@ -11,7 +13,7 @@ from poc_champ.constants import PROGRESS_BAR, PREFIX
 from poc_champ.models import ProcessedArgs
 
 
-def run_job(args: ProcessedArgs) -> list[dict[str, list]]:
+def run_job(args: ProcessedArgs) -> dict:
     """
     Run the main job to search for CVEs and related GitHub repositories.
 
@@ -20,8 +22,8 @@ def run_job(args: ProcessedArgs) -> list[dict[str, list]]:
     :param year_range: Year range argument for filtering CVEs.
     :type year_range: str or None
 
-    :returns: List of dictionaries mapping CVE IDs to lists of repository URLs.
-    :rtype: list
+    :returns: Dictionary mapping CVE IDs to lists of repository URLs.
+    :rtype: dict
 
     :raises RuntimeError: If no CVEs or repositories are found.
     """
@@ -37,19 +39,12 @@ def run_job(args: ProcessedArgs) -> list[dict[str, list]]:
     else:
         cve_list = [args.get("cve_id")]
 
-    result = []
-
-    for cve in track(
-        cve_list,
-        description=PROGRESS_BAR,
-        transient=True,
-    ):
-        cve_links = request_repositories(cve)
-        if cve_links:
-            cve_result = {cve: cve_links}
-            result.append(cve_result)
-
-    if not result:
+    # Run async scraping with semaphore-based concurrency
+    cve_links = asyncio.run(request_repositories(cve_list, args.get("workers")))
+    
+    if not cve_links:
         raise RuntimeError(f"\n[bold yellow]{PREFIX}Sorry, no repos were found =([/bold yellow]")
 
-    return result
+    pprint(f"Found repositories: {cve_links}\n")
+
+    return cve_links
