@@ -6,6 +6,7 @@ import pytest
 from poc_champ.cli.parser import ConfigParser
 
 
+@pytest.mark.unit
 class TestParser:
 
     """Test cases for the ArgParser input handling."""
