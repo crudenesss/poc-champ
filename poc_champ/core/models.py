@@ -1,12 +1,9 @@
-"""Module which contains application specific models."""
+"""Core data models for the PoC Champ application."""
 
 from typing import Optional, TypedDict
 
 
 class ProcessedArgs(TypedDict):
-
-    """Processed arguments extracted from the CLI."""
-
     keyword: Optional[str]
     cve_id: Optional[str]
     range: Optional[str]
