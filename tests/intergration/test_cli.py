@@ -6,6 +6,7 @@ import pytest
 from poc_champ.cli import get_parser
 
 
+@pytest.mark.integration
 class TestInput:
 
     """Test cases for the unified cli input handling."""

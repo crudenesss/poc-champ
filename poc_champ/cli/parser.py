@@ -19,6 +19,13 @@ class ConfigParser:
 
     def _setup_arguments(self):
         """Initialise CLI arguments."""
+        self.parser.add_argument(
+            "-w", "--max-workers",
+            type=int,
+            dest="workers",
+            help="Set the maximum number of workers used in webcrawling job.",
+            default=1
+        )
         subparsers = self.parser.add_subparsers(required=True)
 
         parser_key = subparsers.add_parser(

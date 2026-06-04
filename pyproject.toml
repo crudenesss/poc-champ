@@ -7,11 +7,11 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-typer = "^0.12.5"
-requests = "^2.32.3"
 bs4 = "^0.0.2"
-selenium = "^4.25.0"
 art = "^6.3"
+lxml = "^6.1.1"
+rich = "^15.0.0"
+playwright = "^1.60.0"
 
 [tool.poetry.group.dev.dependencies]
 pylint = "^3.3.8"
@@ -20,6 +20,12 @@ pytest = "^8.4.2"
 
 [tool.poetry.scripts]
 poc-champ = "poc_champ.main:app"
+
+[tool.pytest.ini_options]
+markers = [
+    "unit: Marks tests as low-level unit tests",
+    "integration: Marks tests as higher-level integration tests"
+]
 
 [build-system]
 requires = ["poetry-core"]

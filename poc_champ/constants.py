@@ -20,7 +20,7 @@ including endpoints, parameters, help texts, and decorations.
 # cve.org scraping data
 CVE_ORG_ENDPOINT = "https://www.cve.org/CVERecord/SearchResults"
 CVE_ORG_SEARCH_PARAM = "query"
-CVE_ORG_BTN_CLASS = "pagination-next button cve-button cve-button-outline"
+CVE_ORG_BTN_CLASS = "pagination-next.button.cve-button.cve-button-outline:not([disabled]):not([aria-disabled='true'])"
 
 # Search engine data
 SEARCH_ENGINE_ENDPOINT = "https://duckduckgo.com"

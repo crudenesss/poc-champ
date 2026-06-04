@@ -5,6 +5,7 @@ import pytest
 from poc_champ.cli.validators import CveValidator, YearRangeValidator
 
 
+@pytest.mark.unit
 class TestCveValidator:
 
     """Test cases for CVE ID validation."""
@@ -23,6 +24,7 @@ class TestCveValidator:
         assert cve == validate(cve)
 
 
+@pytest.mark.unit
 class TestYearValidator:
 
     """Test cases for year range validation."""
